@@ -1,58 +1,69 @@
 [package]
-authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
+authors = ['TMC']
+build = 'build.rs'
+description = 'blist node'
 edition = '2018'
-homepage = 'https://substrate.dev'
-license = 'Unlicense'
-name = 'node-template-runtime'
-repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
+name = 'blist-runtime'
 version = '2.0.0'
+
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
 
 [build-dependencies]
-wasm-builder-runner = { package = 'substrate-wasm-builder-runner', version = '2.0.0' }
-
-# alias "parity-scale-code" to "codec"
-[dependencies.codec]
-default-features = false
-features = ['derive']
-package = 'parity-scale-codec'
-version = '1.3.4'
+wasm-builder-runner = { package = 'substrate-wasm-builder-runner', version = '1.0.5'}
 
 [dependencies]
+# other
 hex-literal = { optional = true, version = '0.3.1' }
+
+# substrate
+frame-benchmarking = { version = '2.0.0', default-features = false, optional = true }
+frame-executive = { version = '2.0.0', default-features = false }
+frame-support = { version = '2.0.0', default-features = false }
+frame-system-benchmarking  = { version = '2.0.0', default-features = false, optional = true }
+frame-system = { version = '2.0.0', default-features = false  }
+frame-system-rpc-runtime-api = { version = '2.0.0', default-features = false  }
+sp-api = { version = '2.0.0', default-features = false  }
+sp-block-builder = { version = '2.0.0', default-features = false  }
+sp-consensus-aura = { version = '0.8.0-rc2', default-features = false  }
+sp-core = { version = '2.0.0', default-features = false  }
+sp-io = { version = '2.0.0', default-features = false  }
+sp-inherents = { version = '2.0.0', default-features = false  }
+sp-offchain = { version = '2.0.0', default-features = false  }
+sp-runtime = { version = '2.0.0', default-features = false  }
+sp-session = { version = '2.0.0', default-features = false  }
+sp-std = { version = '2.0.0', default-features = false  }
+sp-transaction-pool = { version = '2.0.0', default-features = false  }
+sp-version = { version = '2.0.0', default-features = false  }
+pallet-aura = { version = '2.0.0', default-features = false  }
+pallet-balances = { version = '2.0.0', default-features = false  }
+pallet-grandpa = { version = '2.0.0', default-features = false  }
+pallet-randomness-collective-flip = { version = '2.0.0', default-features = false  }
+pallet-sudo = { version = '2.0.0', default-features = false  }
+pallet-timestamp = {version = '2.0.0', default-features = false  }
+pallet-transaction-payment = { version = '2.0.0', default-features = false  }
+pallet-transaction-payment-rpc-runtime-api = { version = '2.0.0', default-features = false  }
+codec = { package = 'parity-scale-codec', features = ['derive'], version = '1.3.0', default-features = false }
 serde = { features = ['derive'], optional = true, version = '1.0.101' }
 
-# local dependencies
-pallet-template = { path = '../pallets/template', default-features = false, version = '2.0.0' }
+#orml
+orml-auction = { path = "../orml/auction", default-features = false }
+orml-currencies = { path = "../orml/currencies", default-features = false }
+orml-tokens = { path = "../orml/tokens", default-features = false }
+orml-nft= { path = "../orml/nft", default-features = false }
 
-# Substrate dependencies
-frame-benchmarking = { default-features = false, optional = true, version = '2.0.0' }
-frame-executive = { default-features = false, version = '2.0.0' }
-frame-support = { default-features = false, version = '2.0.0' }
-frame-system = { default-features = false, version = '2.0.0' }
-frame-system-benchmarking = { default-features = false, optional = true, version = '2.0.0' }
-frame-system-rpc-runtime-api = { default-features = false, version = '2.0.0' }
-pallet-aura = { default-features = false, version = '2.0.0' }
-pallet-balances = { default-features = false, version = '2.0.0' }
-pallet-grandpa = { default-features = false, version = '2.0.0' }
-pallet-randomness-collective-flip = { default-features = false, version = '2.0.0' }
-pallet-sudo = { default-features = false, version = '2.0.0' }
-pallet-timestamp = { default-features = false, version = '2.0.0' }
-pallet-transaction-payment = { default-features = false, version = '2.0.0' }
-pallet-transaction-payment-rpc-runtime-api = { default-features = false, version = '2.0.0' }
-sp-api = { default-features = false, version = '2.0.0' }
-sp-block-builder = { default-features = false, version = '2.0.0' }
-sp-consensus-aura = { default-features = false, version = '0.8.0' }
-sp-core = { default-features = false, version = '2.0.0' }
-sp-inherents = { default-features = false, version = '2.0.0' }
-sp-offchain = { default-features = false, version = '2.0.0' }
-sp-runtime = { default-features = false, version = '2.0.0' }
-sp-session = { default-features = false, version = '2.0.0' }
-sp-std = { default-features = false, version = '2.0.0' }
-sp-transaction-pool = { default-features = false, version = '2.0.0' }
-sp-version = { default-features = false, version = '2.0.0' }
+
+# blist 
+pallet-template = { path = '../pallets/template', default-features = false }
+pallet-nft = { path = '../pallets/nft', default-features = false }
+pallet-token = { path = '../pallets/token', default-features = false }
+pallet-aex = { path = '../pallets/aex', default-features = false }
+pallet-bex = { path = '../pallets/bex', default-features = false }
+pallet-cex = { path = '../pallets/cex', default-features = false }
+pallet-dex = { path = '../pallets/dex', default-features = false }
+
+
 
 [features]
 default = ['std']
@@ -67,30 +78,38 @@ runtime-benchmarks = [
     'sp-runtime/runtime-benchmarks',
 ]
 std = [
-    'codec/std',
-    'serde',
-    'frame-executive/std',
-    'frame-support/std',
-    'frame-system/std',
-    'frame-system-rpc-runtime-api/std',
     'pallet-aura/std',
     'pallet-balances/std',
+    'codec/std',
+    'frame-executive/std',
+    'frame-system/std',
+    'frame-support/std',
+    'frame-system-rpc-runtime-api/std',
     'pallet-grandpa/std',
     'pallet-randomness-collective-flip/std',
-    'pallet-sudo/std',
-    'pallet-template/std',
-    'pallet-timestamp/std',
-    'pallet-transaction-payment/std',
-    'pallet-transaction-payment-rpc-runtime-api/std',
+    'serde',
     'sp-api/std',
     'sp-block-builder/std',
     'sp-consensus-aura/std',
     'sp-core/std',
     'sp-inherents/std',
+    'sp-io/std',
     'sp-offchain/std',
     'sp-runtime/std',
     'sp-session/std',
     'sp-std/std',
     'sp-transaction-pool/std',
     'sp-version/std',
+    'pallet-sudo/std',
+    'pallet-timestamp/std',
+    'pallet-transaction-payment/std',
+    'pallet-transaction-payment-rpc-runtime-api/std',
+
+    'orml-nft/std',
+    
+    'pallet-template/std',
+    'pallet-nft/std',
+    'pallet-token/std',
+    'pallet-dex/std',
+
 ]

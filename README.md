@@ -1,25 +1,27 @@
-# Substrate Node Template
+# Team Blist 
+
+Team Blist for Wangxiang Hackathon week2020
 
 A new FRAME-based Substrate node, ready for hacking :rocket:
 
-## Local Development
+Token/NFT(Generate/Transfer/Burn) contributes for Smart City Construction. 
 
-Follow these steps to prepare a local Substrate development environment :hammer_and_wrench:
+## Pallet Description
 
-### Setup
+| Pallet       | Description                              | Reference                                                    | Status             |
+| ------------ | ---------------------------------------- | ------------------------------------------------------------ | ------------------ |
+| Pallet-nft   | 非同质化代币（类别/生成/转移/销毁）      | [ORML](https://github.com/open-web3-stack/open-runtime-module-library) | Done               |
+| Pallet-token | 同质化代币（类别/生成/转移/销毁）        | [ORML]([ORML](https://github.com/open-web3-stack/open-runtime-module-library)) | Done               |
+| Pallet-aex   | Auction Exchange竞价交易模式             | [ORML](https://github.com/open-web3-stack/open-runtime-module-library)/[Acala](https://github.com/AcalaNetwork/Acala) | Developing/Testing |
+| Pallet-bex   | Blind Exchange暗交易模式（隐私保护友好） | [ORML](https://github.com/open-web3-stack/open-runtime-module-library)/[Acala](https://github.com/AcalaNetwork/Acala) | Developing/Testing |
+| Pallet-cex   | Centrilized Exchange中心化交易模式       | [ORML](https://github.com/open-web3-stack/open-runtime-module-library)/[Acala](https://github.com/AcalaNetwork/Acala) | Developing/Testing |
+| Pallet-dex   | Decentrilized Exchange去中心化交易模式   | [ORML](https://github.com/open-web3-stack/open-runtime-module-library)/[Acala](https://github.com/AcalaNetwork/Acala)/[Dex](https://github.com/alexxuyang/substrate-dex) | Done               |
 
-Setup instructions can be found at the
-[Substrate Developer Hub](https://substrate.dev/docs/en/knowledgebase/getting-started).
 
-### Build
 
-Once the development environment is set up, build the node template. This command will build the
-[Wasm](https://substrate.dev/docs/en/knowledgebase/advanced/executor#wasm-execution) and
-[native](https://substrate.dev/docs/en/knowledgebase/advanced/executor#native-execution) code:
 
-```bash
-WASM_BUILD_TOOLCHAIN=nightly-2020-10-05 cargo build --release
-```
+
+
 
 ## Run
 
@@ -28,19 +30,19 @@ WASM_BUILD_TOOLCHAIN=nightly-2020-10-05 cargo build --release
 Purge any existing dev chain state:
 
 ```bash
-./target/release/node-template purge-chain --dev
+./target/release/blist purge-chain --dev
 ```
 
 Start a dev chain:
 
 ```bash
-./target/release/node-template --dev
+./target/release/blist --dev
 ```
 
 Or, start a dev chain with detailed logging:
 
 ```bash
-RUST_LOG=debug RUST_BACKTRACE=1 ./target/release/node-template -lruntime=debug --dev
+RUST_LOG=debug RUST_BACKTRACE=1 ./target/release/blist -lruntime=debug --dev
 ```
 
 ### Multi-Node Local Testnet
@@ -91,7 +93,7 @@ After the node has been [built](#build), refer to the embedded documentation to 
 capabilities and configuration parameters that it exposes:
 
 ```shell
-./target/release/node-template --help
+./target/release/blist --help
 ```
 
 ### Runtime
@@ -151,15 +153,15 @@ Then run the following command to start a single node development chain.
 ```
 
 This command will firstly compile your code, and then start a local development network. You can
-also replace the default command (`cargo build --release && ./target/release/node-template --dev --ws-external`)
+also replace the default command (`cargo build --release && ./target/release/blist --dev --ws-external`)
 by appending your own. A few useful ones are as follow.
 
 ```bash
 # Run Substrate node without re-compiling
-./scripts/docker_run.sh ./target/release/node-template --dev --ws-external
+./scripts/docker_run.sh ./target/release/blist --dev --ws-external
 
 # Purge the local dev chain
-./scripts/docker_run.sh ./target/release/node-template purge-chain --dev
+./scripts/docker_run.sh ./target/release/blist purge-chain --dev
 
 # Check whether the code is compilable
 ./scripts/docker_run.sh cargo check

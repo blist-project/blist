@@ -1,45 +1,58 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
-#![recursion_limit="256"]
+#![recursion_limit = "256"]
 
 // Make the WASM binary available.
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
-use sp_std::prelude::*;
-use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
-use sp_runtime::{
-	ApplyExtrinsicResult, generic, create_runtime_str, impl_opaque_keys, MultiSignature,
-	transaction_validity::{TransactionValidity, TransactionSource},
-};
-use sp_runtime::traits::{
-	BlakeTwo256, Block as BlockT, IdentityLookup, Verify, IdentifyAccount, NumberFor, Saturating,
-};
+use pallet_grandpa::fg_primitives;
+use pallet_grandpa::{AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
 use sp_api::impl_runtime_apis;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use pallet_grandpa::{AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
-use pallet_grandpa::fg_primitives;
-use sp_version::RuntimeVersion;
+use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
+use sp_runtime::traits::{
+	BlakeTwo256, Block as BlockT, IdentifyAccount, IdentityLookup, NumberFor, Saturating, Verify,
+};
+use sp_runtime::{
+	create_runtime_str, generic, impl_opaque_keys,
+	transaction_validity::{TransactionSource, TransactionValidity},
+	ApplyExtrinsicResult, MultiSignature,
+};
+use sp_std::prelude::*;
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
+use sp_version::RuntimeVersion;
 
 // A few exports that help ease life for downstream crates.
-#[cfg(any(feature = "std", test))]
-pub use sp_runtime::BuildStorage;
-pub use pallet_timestamp::Call as TimestampCall;
-pub use pallet_balances::Call as BalancesCall;
-pub use sp_runtime::{Permill, Perbill};
 pub use frame_support::{
-	construct_runtime, parameter_types, StorageValue,
+	construct_runtime, parameter_types,
 	traits::{KeyOwnerProofSystem, Randomness},
 	weights::{
-		Weight, IdentityFee,
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
+		IdentityFee, Weight,
 	},
+	StorageValue,
 };
+pub use pallet_balances::Call as BalancesCall;
+pub use pallet_timestamp::Call as TimestampCall;
+#[cfg(any(feature = "std", test))]
+pub use sp_runtime::BuildStorage;
+pub use sp_runtime::{Perbill, Permill};
 
-/// Import the template pallet.
+/// Import ORML
+// pub use orml_auction;
+// pub use orml_currencies;
+pub use orml_nft;
+// pub use orml_tokens;
+
+pub use pallet_aex;
+pub use pallet_bex;
+pub use pallet_cex;
+pub use pallet_dex;
+pub use pallet_nft;
 pub use pallet_template;
+pub use pallet_token;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -246,6 +259,10 @@ impl pallet_balances::Trait for Runtime {
 
 parameter_types! {
 	pub const TransactionByteFee: Balance = 1;
+	pub const PriceFactor: u128 = 100_000_000;
+	pub const BlocksPerDay: u32 = 6 * 60 * 24;
+	pub const OpenedOrdersArrayCap: u8 = 20;
+	pub const ClosedOrdersArrayCap: u8 = 100;
 }
 
 impl pallet_transaction_payment::Trait for Runtime {
@@ -261,9 +278,40 @@ impl pallet_sudo::Trait for Runtime {
 	type Call = Call;
 }
 
-/// Configure the template pallet in pallets/template.
+/// Orml.
+impl orml_nft::Trait for Runtime {
+	type ClassId = u64;
+	type TokenId = u64;
+	type ClassData = Vec<u8>;
+	type TokenData = Vec<u8>;
+}
+
+/// blist.
 impl pallet_template::Trait for Runtime {
 	type Event = Event;
+}
+impl pallet_nft::Trait for Runtime {
+	type Event = Event;
+}
+impl pallet_aex::Trait for Runtime {
+	type Event = Event;
+}
+impl pallet_bex::Trait for Runtime {
+	type Event = Event;
+}
+impl pallet_cex::Trait for Runtime {
+	type Event = Event;
+}
+impl pallet_token::Trait for Runtime {
+	type Event = Event;
+}
+impl pallet_dex::Trait for Runtime {
+	type Event = Event;
+	type Price = u128;
+	type PriceFactor = PriceFactor;
+	type BlocksPerDay = BlocksPerDay;
+	type OpenedOrdersArrayCap = OpenedOrdersArrayCap;
+	type ClosedOrdersArrayCap = ClosedOrdersArrayCap;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -281,8 +329,19 @@ construct_runtime!(
 		Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
 		TransactionPayment: pallet_transaction_payment::{Module, Storage},
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
-		// Include the custom logic from the template pallet in the runtime.
+		// ORML
+		// OrmlAuction: orml_auction::{Module, Call, Storage, Event<T>},
+		// OrmlCurrencies: orml_currencies::{Module, Call, Storage, Event<T>},
+		// OrmlTokens: orml_tokens::{Module, Call, Storage, Event<T>},
+		OrmlNFT: orml_nft::{Module, Call, Storage},
+		// blist
 		TemplateModule: pallet_template::{Module, Call, Storage, Event<T>},
+		NftModule: pallet_nft::{Module, Call, Storage, Event<T>},
+		TokenModule: pallet_token::{Module, Call, Storage, Event<T>},
+		AexModule: pallet_aex::{Module, Call, Storage, Event<T>},
+		BexModule: pallet_bex::{Module, Call, Storage, Event<T>},
+		CexModule: pallet_cex::{Module, Call, Storage, Event<T>},
+		DexModule: pallet_dex::{Module, Call, Storage, Event<T>},
 	}
 );
 
@@ -304,7 +363,7 @@ pub type SignedExtra = (
 	frame_system::CheckEra<Runtime>,
 	frame_system::CheckNonce<Runtime>,
 	frame_system::CheckWeight<Runtime>,
-	pallet_transaction_payment::ChargeTransactionPayment<Runtime>
+	pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
 );
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
